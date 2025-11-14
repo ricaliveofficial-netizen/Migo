@@ -1,70 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Migo Style Live Room</title>
-<style>
-    body {
-        margin: 0;
-        font-family: sans-serif;
-        background: linear-gradient(#5a1dd9, #b14df1);
-        color: white;
-    }
-    .header {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        font-size: 22px;
-        font-weight: bold;
-    }
-    .join-box {
-        margin: 40px auto;
-        width: 300px;
-        background: rgba(255,255,255,0.15);
-        padding: 20px;
-        border-radius: 16px;
-        text-align: center;
-    }
-    input, button {
-        width: 90%;
-        padding: 10px;
-        border-radius: 10px;
-        border: none;
-        margin-top: 12px;
-    }
-    button {
-        background: #4caf50;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-    }
-</style>
+    <title>Voice Rooms</title>
+    <style>
+        body { font-family: Arial; background:#f7f7f7; padding:30px; text-align:center; }
+        .box{
+            width:320px; margin:auto; background:white; padding:25px;
+            border-radius:12px; box-shadow:0 0 10px #ccc;
+        }
+        input, button{
+            width:100%; padding:12px; font-size:16px; border-radius:8px;
+            border:1px solid #888; margin-top:10px;
+        }
+        button{ background:#4CAF50; color:white; border:none; cursor:pointer; }
+    </style>
 </head>
 <body>
 
-<div class="header">
-    🎤 Migo Live Room
-</div>
+<div class="box">
+    <h2>Enter Room</h2>
 
-<div class="join-box">
-    <h3>Join Voice Room</h3>
-    <input id="uid" placeholder="Enter User ID">
-    <input id="room" placeholder="Enter Room Name (Use: App)">
-    <button onclick="joinRoom()">Join</button>
+    <input id="room" placeholder="Room Name" value="testroom">
+
+    <button onclick="goRoom()">Join Room</button>
 </div>
 
 <script>
-function joinRoom() {
-  const uid = document.getElementById("uid").value;
-  const room = document.getElementById("room").value;
-
-  if (!uid || !room) {
-    alert("Please enter User ID & Room Name");
-    return;
-  }
-
-  window.location.href = `room.html?uid=${uid}&room=${room}`;
+function goRoom(){
+    let r = document.getElementById("room").value;
+    window.location.href = "room.html?room=" + r;
 }
 </script>
 
