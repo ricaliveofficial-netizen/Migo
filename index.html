@@ -1,135 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Migo Style Voice Room</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migo Live Room</title>
 
-    <!-- Agora SDK -->
     <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
 
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background: #0e0f14;
-            font-family: Arial, sans-serif;
-            color: #fff;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 400px;
-            margin: 60px auto;
-            background: #1a1c23;
-            padding: 25px;
-            border-radius: 12px;
+            background: #0d0d0d;
+            color: white;
+            font-family: Arial;
             text-align: center;
-            box-shadow: 0 0 15px #00000060;
         }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #ffea00;
-        }
-
-        input {
-            width: 90%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            outline: none;
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        button {
-            width: 90%;
-            padding: 14px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        #joinBtn { background: #14c85a; color: #fff; }
-        #leaveBtn { background: #ff3e3e; color: #fff; }
-
-        .hide { display: none; }
-
-        #statusBox {
-            margin-top: 20px;
-            font-size: 18px;
+        .status {
+            margin-top: 40px;
+            font-size: 22px;
+            color: #0f0;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-
-        <h2>🎤 Live Voice Room</h2>
-
-        <input id="channelName" placeholder="Enter Channel Name" value="testroom" />
-
-        <button onclick="joinRoom()" id="joinBtn">Join Room</button>
-        <button onclick="leaveRoom()" id="leaveBtn" class="hide">Leave Room</button>
-
-        <div id="statusBox">Not Joined</div>
-
-    </div>
+    <h2>Migo Style Live Room</h2>
+    <div class="status" id="status">Connecting...</div>
 
     <script>
-        const APP_ID = "7fa49d40c11047eba821e707d47c6736";
+        // -----------------------------
+        // CONFIG
+        // -----------------------------
+        const APP_ID = "7fa49d40c11047eba821e707d47c6736";  // তোমার App ID
+        const CHANNEL_NAME = "migoroom";
+        const TOKEN = null; // Token লাগবে না (App Certificate বন্ধ থাকলে)
 
-        let client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
-        let localAudioTrack;
-        let joined = false;
+        // Auto generate UID
+        const UID = Math.floor(Math.random() * 90000) + 10000;
+
+        const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
         async function joinRoom() {
-            if (joined) return;
-            joined = true;
+            try {
+                document.getElementById("status").innerText = "Joining room...";
 
-            const channel = document.getElementById("channelName").value.trim();
-            if (!channel) return alert("Channel name required!");
+                // Join channel
+                await client.join(APP_ID, CHANNEL_NAME, TOKEN, UID);
 
-            document.getElementById("statusBox").innerText = "Joining...";
+                document.getElementById("status").innerText = "Joined! Connecting mic...";
 
-            await client.setClientRole("host");
-            await client.join(APP_ID, channel, null, null);
+                // Create microphone track
+                const mic = await AgoraRTC.createMicrophoneAudioTrack();
 
-            // Mic on
-            localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-            await client.publish([localAudioTrack]);
+                // Publish voice
+                await client.publish([mic]);
 
-            document.getElementById("statusBox").innerText = "Joined & Live";
-            document.getElementById("leaveBtn").classList.remove("hide");
-            document.getElementById("joinBtn").classList.add("hide");
+                document.getElementById("status").innerText = "You are LIVE (Mic ON).";
 
-            // Listen to others
-            client.on("user-published", async (user, mediaType) => {
-                await client.subscribe(user, mediaType);
-                if (mediaType === "audio") {
-                    user.audioTrack.play();
-                }
-            });
+                // Play remote users audio
+                client.on("user-published", async (user, mediaType) => {
+                    await client.subscribe(user, mediaType);
+
+                    if (mediaType === "audio") {
+                        user.audioTrack.play();
+                    }
+                });
+
+            } catch (err) {
+                document.getElementById("status").innerText = "Join failed!";
+                console.error(err);
+            }
         }
 
-        async function leaveRoom() {
-            if (!joined) return;
-            joined = false;
-
-            localAudioTrack.stop();
-            localAudioTrack.close();
-
-            await client.leave();
-
-            document.getElementById("statusBox").innerText = "Left Room";
-            document.getElementById("leaveBtn").classList.add("hide");
-            document.getElementById("joinBtn").classList.remove("hide");
-        }
+        joinRoom();
     </script>
 
 </body>
