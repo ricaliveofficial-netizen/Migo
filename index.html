@@ -1,81 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Migo Live Room</title>
-
-    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
-
-    <style>
-        body {
-            margin: 0;
-            background: #0d0d0d;
-            color: white;
-            font-family: Arial;
-            text-align: center;
-        }
-
-        .status {
-            margin-top: 40px;
-            font-size: 22px;
-            color: #0f0;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Join Voice Room</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: white;
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 6px;
+    }
+    button {
+      background: #4caf50;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
 
-    <h2>Migo Style Live Room</h2>
-    <div class="status" id="status">Connecting...</div>
+<h2>Voice Room Join</h2>
 
-    <script>
-        // -----------------------------
-        // CONFIG
-        // -----------------------------
-        const APP_ID = "7fa49d40c11047eba821e707d47c6736";  // তোমার App ID
-        const CHANNEL_NAME = "migoroom";
-        const TOKEN = null; // Token লাগবে না (App Certificate বন্ধ থাকলে)
+<input id="uid" placeholder="Enter User ID">
+<input id="room" placeholder="Enter Room Name">
 
-        // Auto generate UID
-        const UID = Math.floor(Math.random() * 90000) + 10000;
+<button onclick="joinRoom()">Join</button>
 
-        const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+<script>
+function joinRoom() {
+  const uid = document.getElementById("uid").value;
+  const room = document.getElementById("room").value;
 
-        async function joinRoom() {
-            try {
-                document.getElementById("status").innerText = "Joining room...";
+  if (!uid || !room) {
+    alert("Please enter User ID & Room name");
+    return;
+  }
 
-                // Join channel
-                await client.join(APP_ID, CHANNEL_NAME, TOKEN, UID);
-
-                document.getElementById("status").innerText = "Joined! Connecting mic...";
-
-                // Create microphone track
-                const mic = await AgoraRTC.createMicrophoneAudioTrack();
-
-                // Publish voice
-                await client.publish([mic]);
-
-                document.getElementById("status").innerText = "You are LIVE (Mic ON).";
-
-                // Play remote users audio
-                client.on("user-published", async (user, mediaType) => {
-                    await client.subscribe(user, mediaType);
-
-                    if (mediaType === "audio") {
-                        user.audioTrack.play();
-                    }
-                });
-
-            } catch (err) {
-                document.getElementById("status").innerText = "Join failed!";
-                console.error(err);
-            }
-        }
-
-        joinRoom();
-    </script>
+  window.location.href = `room.html?uid=${uid}&room=${room}`;
+}
+</script>
 
 </body>
 </html>
