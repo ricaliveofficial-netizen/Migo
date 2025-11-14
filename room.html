@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Migo Live Room</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+    body {
+        margin: 0;
+        font-family: sans-serif;
+        background: linear-gradient(#5a1dd9, #b14df1);
+        color: white;
+    }
+    .header {
+        padding: 15px;
+        font-size: 22px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">🎤 Migo Live Room</div>
+
+<button onclick="joinVoice()" style="
+    padding:15px;
+    border:none;
+    width:90%;
+    margin:20px;
+    border-radius:12px;
+    font-size:20px;
+    font-weight:bold;
+">Join Voice</button>
+
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+
+<script>
+const appId = "7fa49d40c11047eba821e707d47c6736";
+const channel = "migo-room";
+let uid = new URLSearchParams(window.location.search).get("uid");
+let client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+
+async function joinVoice() {
+    await client.join(appId, channel, null, uid);
+    const mic = await AgoraRTC.createMicrophoneAudioTrack();
+    await client.publish([mic]);
+    alert("Voice Connected!");
+}
+</script>
+
+</body>
+</html>
