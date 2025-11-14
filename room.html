@@ -1,49 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Migo Live Room</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<style>
+  <meta charset="UTF-8">
+  <title>Voice Room</title>
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+  <style>
     body {
-        margin: 0;
-        font-family: sans-serif;
-        background: linear-gradient(#5a1dd9, #b14df1);
-        color: white;
+      background: #0a0a0a;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding-top: 60px;
     }
-    .header {
-        padding: 15px;
-        font-size: 22px;
-        font-weight: bold;
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin: 20px;
+      border-radius: 8px;
+      border: none;
+      background: #f44336;
+      color: white;
+      cursor: pointer;
     }
-</style>
+  </style>
 </head>
 <body>
 
-<div class="header">🎤 Migo Live Room</div>
+<h2>Voice Room Active</h2>
+<p id="info"></p>
 
-<button onclick="joinVoice()" style="
-    padding:15px;
-    border:none;
-    width:90%;
-    margin:20px;
-    border-radius:12px;
-    font-size:20px;
-    font-weight:bold;
-">Join Voice</button>
-
-<script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+<button onclick="leave()">Leave Room</button>
 
 <script>
-const appId = "7fa49d40c11047eba821e707d47c6736";
-const channel = "migo-room";
-let uid = new URLSearchParams(window.location.search).get("uid");
-let client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+// YOUR AGORA CONFIG
+const APP_ID = "4adcf999c7734666ae4041af8aa1ee20";
 
-async function joinVoice() {
-    await client.join(appId, channel, null, uid);
-    const mic = await AgoraRTC.createMicrophoneAudioTrack();
-    await client.publish([mic]);
-    alert("Voice Connected!");
+const TOKEN = "007eJxTYJHqi7tRJL571J3j/roVrekZ28rTfYOFJbeY5bchDPdVd2j4FZGBkZGxiamtkaWJqYmyWZGxomWJiZGBoZmRrZGBoaWqbmaCSlpKWp6QAAaXMFhQ==";
+// Token channel = App
+
+// URL Params
+const url = new URL(window.location.href);
+const UID = url.searchParams.get("uid");
+const CHANNEL = url.searchParams.get("room");
+
+document.getElementById("info").innerHTML =
+  `Joining Room: <b>${CHANNEL}</b> as User <b>${UID}</b>`;
+
+// Agora Client
+const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+
+async function joinRoom() {
+  try {
+    await client.join(APP_ID, CHANNEL, TOKEN, UID);
+
+    const localAudio = await AgoraRTC.createMicrophoneAudioTrack();
+    await client.publish(localAudio);
+
+    console.log("Joined voice room successfully!");
+  } catch (err) {
+    alert("Join failed: " + err.message);
+    console.error(err);
+  }
+}
+
+joinRoom();
+
+function leave() {
+  client.leave();
+  alert("You left the room");
+  window.location.href = "index.html";
 }
 </script>
 
