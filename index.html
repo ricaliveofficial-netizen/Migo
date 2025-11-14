@@ -1,36 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Voice Rooms</title>
-    <style>
-        body { font-family: Arial; background:#f7f7f7; padding:30px; text-align:center; }
-        .box{
-            width:320px; margin:auto; background:white; padding:25px;
-            border-radius:12px; box-shadow:0 0 10px #ccc;
-        }
-        input, button{
-            width:100%; padding:12px; font-size:16px; border-radius:8px;
-            border:1px solid #888; margin-top:10px;
-        }
-        button{ background:#4CAF50; color:white; border:none; cursor:pointer; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Room</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      text-align: center;
+    }
+    .box {
+      background: white;
+      padding: 25px;
+      width: 350px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    input {
+      width: 95%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #ff4d4d;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Enter Room</h2>
+  <h2>Join a Voice Room</h2>
+  <div class="box">
+    <input id="roomInput" type="text" placeholder="Enter Room Name…" />
+    <button onclick="joinRoom()">Join</button>
+  </div>
 
-    <input id="room" placeholder="Room Name" value="testroom">
-
-    <button onclick="goRoom()">Join Room</button>
-</div>
-
-<script>
-function goRoom(){
-    let r = document.getElementById("room").value;
-    window.location.href = "room.html?room=" + r;
-}
-</script>
+  <script>
+    function joinRoom() {
+      const room = document.getElementById("roomInput").value;
+      if (!room) {
+        alert("Room name required");
+        return;
+      }
+      window.location.href = `room.html?room=${room}`;
+    }
+  </script>
 
 </body>
 </html>
