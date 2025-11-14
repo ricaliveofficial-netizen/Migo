@@ -1,75 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Voice Room</title>
-  <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
-  <style>
-    body {
-      background: #0a0a0a;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding-top: 60px;
-    }
-    button {
-      padding: 12px 20px;
-      font-size: 16px;
-      margin: 20px;
-      border-radius: 8px;
-      border: none;
-      background: #f44336;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Voice Room</title>
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+
+    <style>
+        body { font-family: Arial; background:#eef2f5; padding:20px; text-align:center; }
+        .box{
+            margin:auto; background:white; width:350px; padding:25px;
+            border-radius:12px; box-shadow:0 0 10px #ccc;
+        }
+        button{
+            width:100%; padding:12px; background:#FF5252;
+            border:none; border-radius:8px; color:white;
+            font-size:16px; margin-top:15px; cursor:pointer;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>Voice Room Active</h2>
-<p id="info"></p>
-
-<button onclick="leave()">Leave Room</button>
+<div class="box">
+    <h2 id="title">Joining...</h2>
+    <p id="status">Please wait...</p>
+    <button onclick="leaveRoom()">Leave Room</button>
+</div>
 
 <script>
-// YOUR AGORA CONFIG
-const APP_ID = "4adcf999c7734666ae4041af8aa1ee20";
+    const APP_ID = "4adcf999c7734666ae4041af8aa1ee20";
+    const TOKEN = "007eJxTYHjlq7tRJL571j3/roVreKZ82rfTYOFJbeY5boK7LmXucolQYDBJTElOs7S0TDY3NzYxMzNLTDUxMDFMTLNITDRMTTUyyP8kltkQyMjwMCGOlZEBAkF8ZgbHggIGBgBHzh9F";
 
-const TOKEN = "007eJxTYJHqi7tRJL571J3j/roVrekZ28rTfYOFJbeY5bchDPdVd2j4FZGBkZGxiamtkaWJqYmyWZGxomWJiZGBoZmRrZGBoaWqbmaCSlpKWp6QAAaXMFhQ==";
-// Token channel = App
+    const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
-// URL Params
-const url = new URL(window.location.href);
-const UID = url.searchParams.get("uid");
-const CHANNEL = url.searchParams.get("room");
+    async function joinRoom(){
+        const params = new URLSearchParams(window.location.search);
+        const room = params.get("room");
 
-document.getElementById("info").innerHTML =
-  `Joining Room: <b>${CHANNEL}</b> as User <b>${UID}</b>`;
+        document.getElementById("title").innerText = "Room: " + room;
 
-// Agora Client
-const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        try {
+            await client.join(APP_ID, room, TOKEN, null);
 
-async function joinRoom() {
-  try {
-    await client.join(APP_ID, CHANNEL, TOKEN, UID);
+            const mic = await AgoraRTC.createMicrophoneAudioTrack();
+            await client.publish(mic);
 
-    const localAudio = await AgoraRTC.createMicrophoneAudioTrack();
-    await client.publish(localAudio);
+            document.getElementById("status").innerText = "🎤 Connected — You Can Talk Now";
+        } catch (e) {
+            document.getElementById("status").innerText = "❌ Error: " + e.message;
+        }
+    }
 
-    console.log("Joined voice room successfully!");
-  } catch (err) {
-    alert("Join failed: " + err.message);
-    console.error(err);
-  }
-}
+    function leaveRoom(){
+        client.leave();
+        window.location.href = "index.html";
+    }
 
-joinRoom();
-
-function leave() {
-  client.leave();
-  alert("You left the room");
-  window.location.href = "index.html";
-}
+    joinRoom();
 </script>
 
 </body>
